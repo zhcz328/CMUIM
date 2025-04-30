@@ -227,19 +227,19 @@ def train_one_epoch(
 
 
 def train_one_epoch_continual(
-    model_current,
-    model_previous,
-    data_loader,
-    buffer_loader,
-    optimizer,
-    device,
-    epoch,
-    curriculum_factor,
-    loss_scaler,
-    loss_scaler_mask,
-    sagp,
-    args=None,
-    log_writer=None,
+        model_current,
+        model_previous,
+        data_loader,
+        buffer_loader,
+        optimizer,
+        device,
+        epoch,
+        curriculum_factor,
+        loss_scaler,
+        loss_scaler_mask,
+        sagp,
+        args=None,
+        log_writer=None,
 ):
     """
     Train the CMUIM model with continual learning for one epoch.
@@ -319,14 +319,14 @@ def train_one_epoch_continual(
 
         # Combine current samples and buffer samples for diverse training
         combined_samples = torch.cat([
-            samples[:samples.size(0)//2],
-            perturbed_buffer[:perturbed_buffer.size(0)//2]
+            samples[:samples.size(0) // 2],
+            perturbed_buffer[:perturbed_buffer.size(0) // 2]
         ], dim=0)
 
         with torch.cuda.amp.autocast():
             # Train masking network on combined samples
             loss_recon, loss_area, loss_kl, loss_diversity = model_current(
-                combined_samples,
+                combined_samples,  # Use combined samples with perturbed buffer
                 mask_ratio=args.mask_ratio,
                 train_mask=True
             )
@@ -359,16 +359,25 @@ def train_one_epoch_continual(
             loss_recon, latent_current = model_current(samples, mask_ratio=args.mask_ratio)
             recon_losses.update(loss_recon.item())
 
-            # Cross-task alignment with buffer samples
-            _, latent_current_buffer = model_current(perturbed_buffer, mask_ratio=args.mask_ratio)
+            # Cross-task alignment using both current samples and buffer samples
+            # Create a combined batch for alignment following the paper's formulation
+            combined_samples_alignment = torch.cat([
+                samples,
+                perturbed_buffer
+            ], dim=0)
 
+            # Get features from current model for both current and buffer samples
+            _, latent_current_combined = model_current(combined_samples_alignment, mask_ratio=args.mask_ratio)
+
+            # Get features from previous model for both current and buffer samples
             with torch.no_grad():
-                _, latent_previous_buffer = model_previous(perturbed_buffer, mask_ratio=args.mask_ratio)
+                _, latent_previous_combined = model_previous(combined_samples_alignment, mask_ratio=args.mask_ratio)
 
             # Calculate contrastive alignment loss
+            # This now properly uses both D_k and D_k_Inc as specified in the paper
             contra_loss, acc = cal_contrastive_loss(
-                latent_current_buffer,
-                latent_previous_buffer,
+                latent_current_combined,
+                latent_previous_combined,
                 temperature=args.temperature if hasattr(args, 'temperature') else 0.05
             )
 
@@ -394,7 +403,7 @@ def train_one_epoch_continual(
 
         # Log metrics
         if (data_iter_step + 1) % print_freq == 0:
-            print(f"Step: [{data_iter_step+1}/{num_batches}] "
+            print(f"Step: [{data_iter_step + 1}/{num_batches}] "
                   f"Stage I Loss: {stage1_losses.avg:.4f} "
                   f"Stage II Loss: {stage2_losses.avg:.4f} "
                   f"Recon Loss: {recon_losses.avg:.4f} "
@@ -424,7 +433,6 @@ def train_one_epoch_continual(
     }
 
     return metrics
-
 
 def adjust_learning_rate(optimizer, epoch, args):
     """
