@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """
-Main entry point for S3UM (Selective State Space Ultrasound Masking).
-
 This script provides a unified interface for training, testing, and visualization
-of the S3UM architecture for continual self-supervised learning in ultrasound imaging.
+of the CMUIM architecture for continual self-supervised learning in ultrasound imaging.
 """
 
 import os
@@ -19,7 +17,7 @@ import random
 from pathlib import Path
 from torch.utils.tensorboard import SummaryWriter
 
-from config import get_args_parser, S3UMConfig
+from config import get_args_parser, CMUIMConfig
 from models.model_cmuim import CMUIM
 from models.sagp import SemanticAwareGradientPerturbation
 from datasets.data_loader import create_dataset_loaders, create_continual_datasets
@@ -41,13 +39,13 @@ from utils.misc import NativeScaler, save_model, load_model
 
 def main(args):
     """
-    Main function for S3UM training and evaluation.
+    Main function for CMUIM training and evaluation.
 
     Args:
         args: Parsed command line arguments
     """
     # Create config from args
-    config = S3UMConfig.from_args(args)
+    config = CMUIMConfig.from_args(args)
     print(f"Config: {config}")
 
     # Setup device

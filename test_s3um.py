@@ -1,5 +1,5 @@
 """
-Test script for the S3UM architecture.
+Test script for the CMUIM architecture.
 This script demonstrates the usage of the MaskingNet model and its visualization.
 """
 
@@ -14,16 +14,16 @@ from matplotlib.backends.backend_pdf import PdfPages
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import argparse
 
-from models.S3UM.masking_net import MaskingNet
-from util.config import get_config, S3UMConfig
+from models.masking_net import MaskingNet
+from util.config import get_config, CMUIMConfig
 
 
-class TestS3UM:
+class TestCMUIM:
     """
-    Test class for the S3UM architecture with visualization capabilities.
+    Test class for the CMUIM architecture with visualization capabilities.
     """
 
-    def __init__(self, config: S3UMConfig = None):
+    def __init__(self, config: CMUIMConfig = None):
         """
         Initialize the test class with configuration parameters.
 
@@ -398,7 +398,7 @@ def parse_args():
     Returns:
         args: Parsed arguments
     """
-    parser = argparse.ArgumentParser(description="Test S3UM model.")
+    parser = argparse.ArgumentParser(description="Test CMUIM model.")
     parser.add_argument("--config_path", type=str, default=None,
                         help="Path to configuration file.")
     parser.add_argument("--batch_size", type=int, default=None,
@@ -434,7 +434,7 @@ if __name__ == "__main__":
         config.visualization.save_visualizations = False
 
     # Create test instance
-    tester = TestS3UM(config)
+    tester = TestCMUIM(config)
 
     # Run test
     tester.run()
