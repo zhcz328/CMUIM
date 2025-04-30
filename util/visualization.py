@@ -1,5 +1,5 @@
 """
-Visualization utilities for S3UM architecture.
+Visualization utilities for CMUIM architecture.
 
 This module implements visualization functions for model outputs and masks.
 """
