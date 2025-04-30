@@ -9,10 +9,10 @@ for anatomically-aware representation learning.
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .masking_net import MaskingNet
+from masking_net import MaskingNet
 from einops import repeat, rearrange
 import numpy as np
-from ..utils.positional_embedding import get_2d_sincos_pos_embed, interpolate_pos_embed
+from util.positional_embedding import get_2d_sincos_pos_embed, interpolate_pos_embed
 from timm.models.vision_transformer import PatchEmbed
 
 
@@ -172,6 +172,11 @@ class CMUIM(nn.Module):
         self.lambda_kl = lambda_kl
         self.lambda_diversity = lambda_diversity
 
+        # Training states
+        self.backbone_frozen = False
+        self.maskingnet_frozen = False
+        self.previous_encoder = None
+
         # Patch embedding
         self.patch_embed = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
         num_patches = self.patch_embed.num_patches
@@ -186,47 +191,6 @@ class CMUIM(nn.Module):
             dropout=0.1,
             norm_layer=norm_layer
         )
-
-        # Encoder: We use standard ViT architecture for the encoder
-        # Class token and positional embedding
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
-        self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + 1, embed_dim), requires_grad=False)
-
-        # Encoder blocks
-        self.blocks = nn.ModuleList([
-            Block(
-                dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio,
-                qkv_bias=True, norm_layer=norm_layer
-            )
-            for i in range(depth)
-        ])
-        self.norm = norm_layer(embed_dim)
-
-        # Decoder
-        self.decoder_embed = nn.Linear(embed_dim, decoder_embed_dim, bias=True)
-        self.mask_token = nn.Parameter(torch.zeros(1, 1, decoder_embed_dim))
-
-        # Decoder positional embedding (separate from encoder)
-        self.decoder_pos_embed = nn.Parameter(torch.zeros(1, num_patches + 1, decoder_embed_dim), requires_grad=False)
-
-        # Decoder blocks
-        self.decoder_blocks = nn.ModuleList([
-            Block(
-                dim=decoder_embed_dim, num_heads=decoder_num_heads, mlp_ratio=mlp_ratio,
-                qkv_bias=True, norm_layer=norm_layer
-            )
-            for i in range(decoder_depth)
-        ])
-
-        self.decoder_norm = norm_layer(decoder_embed_dim)
-        self.decoder_pred = nn.Linear(decoder_embed_dim, patch_size ** 2 * in_chans, bias=True)
-
-        # Initialize weights
-        self.initialize_weights()
-
-        # Training flags to control which parts of the model are updated
-        self.maskingnet_frozen = False
-        self.backbone_frozen = False
 
     def initialize_weights(self):
         """Initialize model weights with appropriate strategies."""
@@ -260,34 +224,131 @@ class CMUIM(nn.Module):
             nn.init.constant_(m.bias, 0)
             nn.init.constant_(m.weight, 1.0)
 
-    def freeze_maskingnet(self):
-        """Freeze the masking network parameters."""
-        for param in self.masking_net.parameters():
-            param.requires_grad = False
-        self.maskingnet_frozen = True
-
-    def unfreeze_maskingnet(self):
-        """Unfreeze the masking network parameters."""
-        for param in self.masking_net.parameters():
-            param.requires_grad = True
-        self.maskingnet_frozen = False
-
     def freeze_backbone(self):
-        """Freeze the encoder-decoder backbone parameters."""
-        for param in self.parameters():
+        """
+        Freeze the backbone encoder-decoder parameters but keep masking network trainable.
+        """
+        # Freeze patch embedding
+        for param in self.patch_embed.parameters():
             param.requires_grad = False
 
-        # Unfreeze masking network
-        for param in self.masking_net.parameters():
-            param.requires_grad = True
+        # Freeze encoder parts
+        for param in self.cls_token.parameters():
+            param.requires_grad = False
+
+        # The positional embedding is not trainable by default
+
+        # Freeze encoder blocks
+        for block in self.blocks:
+            for param in block.parameters():
+                param.requires_grad = False
+
+        # Freeze encoder norm
+        for param in self.norm.parameters():
+            param.requires_grad = False
+
+        # Freeze decoder parts
+        for param in self.decoder_embed.parameters():
+            param.requires_grad = False
+
+        for param in self.mask_token.parameters():
+            param.requires_grad = False
+
+        # Freeze decoder blocks
+        for block in self.decoder_blocks:
+            for param in block.parameters():
+                param.requires_grad = False
+
+        # Freeze decoder norm and prediction head
+        for param in self.decoder_norm.parameters():
+            param.requires_grad = False
+
+        for param in self.decoder_pred.parameters():
+            param.requires_grad = False
 
         self.backbone_frozen = True
 
     def unfreeze_backbone(self):
-        """Unfreeze the encoder-decoder backbone parameters."""
-        for param in self.parameters():
+        """
+        Unfreeze the backbone encoder-decoder parameters.
+        """
+        # Unfreeze patch embedding
+        for param in self.patch_embed.parameters():
             param.requires_grad = True
+
+        # Unfreeze encoder parts
+        for param in self.cls_token.parameters():
+            param.requires_grad = True
+
+        # Unfreeze encoder blocks
+        for block in self.blocks:
+            for param in block.parameters():
+                param.requires_grad = True
+
+        # Unfreeze encoder norm
+        for param in self.norm.parameters():
+            param.requires_grad = True
+
+        # Unfreeze decoder parts
+        for param in self.decoder_embed.parameters():
+            param.requires_grad = True
+
+        for param in self.mask_token.parameters():
+            param.requires_grad = True
+
+        # Unfreeze decoder blocks
+        for block in self.decoder_blocks:
+            for param in block.parameters():
+                param.requires_grad = True
+
+        # Unfreeze decoder norm and prediction head
+        for param in self.decoder_norm.parameters():
+            param.requires_grad = True
+
+        for param in self.decoder_pred.parameters():
+            param.requires_grad = True
+
         self.backbone_frozen = False
+
+    def freeze_maskingnet(self):
+        """
+        Freeze the masking network parameters.
+        """
+        for param in self.masking_net.parameters():
+            param.requires_grad = False
+
+        self.maskingnet_frozen = True
+
+    def unfreeze_maskingnet(self):
+        """
+        Unfreeze the masking network parameters.
+        """
+        for param in self.masking_net.parameters():
+            param.requires_grad = True
+
+        self.maskingnet_frozen = False
+
+    def store_previous_encoder(self):
+        """
+        Store the current encoder as the previous encoder for continual learning.
+        """
+        self.previous_encoder = type(self)(
+            img_size=self.img_size,
+            patch_size=self.patch_size,
+            in_chans=self.in_chans,
+            embed_dim=self.embed_dim,
+            depth=len(self.blocks),
+            decoder_embed_dim=self.decoder_embed.out_features,
+            d_state=self.masking_net.d_state if hasattr(self.masking_net, 'd_state') else 16,
+            norm_pix_loss=self.norm_pix_loss
+        ).to(self.cls_token.device)
+
+        # Copy parameters from current model
+        self.previous_encoder.load_state_dict(self.state_dict())
+
+        # Freeze the previous encoder
+        for param in self.previous_encoder.parameters():
+            param.requires_grad = False
 
     def patchify(self, imgs):
         """
@@ -447,56 +508,55 @@ class CMUIM(nn.Module):
 
         return loss, pred, mask
 
-    def forward(self, imgs, mask_ratio=0.75, train_mask=False):
+    def forward(self, x, mask_ratio=0.75, train_mask=False):
         """
-        Forward pass through the entire model.
+        Forward pass of the CMUIM model.
 
         Args:
-            imgs (torch.Tensor): [B, 3, H, W] input images
+            x (torch.Tensor): [B, 3, H, W] input images
             mask_ratio (float): Fraction of patches to mask
             train_mask (bool): Whether to train the masking network
 
         Returns:
             loss (torch.Tensor): Reconstruction loss
-            pred (torch.Tensor): Predicted patches (if train_mask=False)
-            loss_gauss, loss_kl, loss_diversity (torch.Tensor): Additional losses (if train_mask=True)
+            loss_area (torch.Tensor, optional): Area regularization loss (if train_mask=True)
+            loss_kl (torch.Tensor, optional): KL divergence loss (if train_mask=True)
+            loss_diversity (torch.Tensor, optional): Diversity regularization loss (if train_mask=True)
         """
-        latent = None
-
         if train_mask:
-            # Forward pass for masking network training
-            x = self.patch_embed(imgs)
-            mask_probs, loss_area, loss_diversity = self.masking_net(x, train_mask=True)
+            # Get patch embeddings
+            x_embed = self.patch_embed(x)
+
+            # Generate mask probabilities and calculate regularization losses
+            mask_probs, loss_area, loss_diversity = self.masking_net(x_embed, train_mask=True)
 
             # Convert probabilities to binary mask
-            mask = self.masking_net.get_binary_mask(x, mask_ratio)
+            mask = self.masking_net.get_binary_mask(x_embed, mask_ratio)
 
-            # Encode and decode
-            latent, mask = self.forward_encoder(imgs, mask)
-            pred = self.forward_decoder(latent, mask)
+            # In S3UM module, KL divergence is not used but kept for interface consistency
+            loss_kl = torch.tensor(0.0, device=x.device)
 
-            # Compute reconstruction loss
-            recon_loss, _, _ = self.forward_loss(imgs, pred, mask)
+            # Forward pass with masked image modeling
+            _, mask = self.forward_encoder(x, mask)
+            pred = self.forward_decoder(_, mask)
 
-            # Add regularization losses
-            loss_gauss = self.lambda_gauss * loss_area
-            loss_kl = self.lambda_kl * torch.zeros_like(loss_area)  # Placeholder for KL divergence
-            loss_diversity = self.lambda_diversity * loss_diversity
+            # Calculate reconstruction loss
+            loss, _, _ = self.forward_loss(x, pred, mask)
 
-            return recon_loss, loss_gauss, loss_kl, loss_diversity
+            return loss, loss_area, loss_kl, loss_diversity
         else:
-            # Standard forward pass
-            x = self.patch_embed(imgs)
+            # Get patch embeddings
+            x_embed = self.patch_embed(x)
 
-            # Generate mask
-            mask = self.masking_net.get_binary_mask(x, mask_ratio)
+            # Generate mask using masking network
+            mask = self.masking_net.get_binary_mask(x_embed, mask_ratio)
 
             # Encode and decode
-            latent, mask = self.forward_encoder(imgs, mask)
+            latent, mask = self.forward_encoder(x, mask)
             pred = self.forward_decoder(latent, mask)
 
             # Compute loss
-            loss, pred, mask = self.forward_loss(imgs, pred, mask)
+            loss, _, _ = self.forward_loss(x, pred, mask)
 
             return loss, latent
 
