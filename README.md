@@ -12,14 +12,6 @@ CMUIM is designed to address the unique challenges of ultrasound image analysis 
 
 3. **Semantic-Aware Gradient Perturbation (SAGP)**: A technique that improves feature separability and reduces catastrophic forgetting during task transitions.
 
-## Architecture
-
-The S3UM architecture consists of several key components:
-
-- **SSMKernel**: Implements the selective state space model with input-dependent parameters for adaptive processing of ultrasound content.
-- **S3UMBlock**: Combines selective state space models with convolutional and gating mechanisms for efficient feature extraction.
-- **MaskingNet**: Creates masks that prioritize anatomically significant regions for reconstruction.
-- **CMUIM**: The complete model that integrates masked autoencoding with continual learning strategies.
 
 ## Installation
 
@@ -87,8 +79,6 @@ Key parameters:
 - `depth`: Number of transformer blocks (default: 12)
 - `d_state`: State dimension for SSM (default: 16)
 - `mask_ratio`: Fraction of patches to mask (default: 0.75)
-- `alpha`: Weight for balancing task-specific and cross-task losses (default: 0.8)
-- `beta`: Weight for semantic-aware gradient perturbation (default: 0.2)
 
 ## Dataset Structure
 
