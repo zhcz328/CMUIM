@@ -26,11 +26,11 @@ def get_args_parser():
     parser.add_argument('--embed_dim', default=768, type=int,
                         help='Embedding dimension for vision transformer')
     parser.add_argument('--depth', default=5, type=int,
-                        help='Number of S6 blocks')
+                        help='Number of S3UM blocks')
     parser.add_argument('--d_state', default=16, type=int,
                         help='State dimension for SSM')
     parser.add_argument('--d_conv', default=4, type=int,
-                        help='Kernel size for depth-wise convolution in S6 block')
+                        help='Kernel size for depth-wise convolution in S3UM block')
     parser.add_argument('--dropout', default=0.1, type=float,
                         help='Dropout rate for the model')
     parser.add_argument('--dt_min', default=0.001, type=float,

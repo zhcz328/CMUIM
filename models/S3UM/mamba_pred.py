@@ -210,7 +210,7 @@ def selective_ssm_scan_with_dynamic_A_B_C(u, A_log, B_values, C_values, delta, d
     # Stack outputs
     return torch.stack(ys, dim=2)  # [B, D, L]
 
-# class S6Block(nn.Module):
+# class S3UMBlock(nn.Module):
 #     """
 #     Mamba-inspired Selective State Space Block
 #     """
@@ -246,7 +246,7 @@ def selective_ssm_scan_with_dynamic_A_B_C(u, A_log, B_values, C_values, delta, d
 #
 #         return x
 
-# class S6Block(nn.Module):
+# class S3UMBlock(nn.Module):
 #     """
 #     Dual-branch Mamba-inspired Selective State Space Block
 #     with multiplication between branch outputs
@@ -286,9 +286,9 @@ def selective_ssm_scan_with_dynamic_A_B_C(u, A_log, B_values, C_values, delta, d
 #         output = x + ssm_output * ffn_output
 #
 #         return output
-class S6Block(nn.Module):
+class S3UMBlock(nn.Module):
     """
-    S6Block with Mamba-style architecture featuring selective SSM
+    S3UMBlock with Mamba-style architecture featuring selective SSM
     """
 
     def __init__(self, dim, d_state=16, d_conv=4, dropout=0.1):
@@ -359,7 +359,7 @@ class MaskingNet(nn.Module):
             self,
             num_tokens,  # Number of image patches/tokens
             embed_dim=256,  # Embedding dimension
-            depth=5,  # Number of S6 blocks
+            depth=5,  # Number of S3UM blocks
             d_state=16,  # State dimension for SSM
             dropout=0.0,  # Dropout rate
             norm_layer=nn.LayerNorm
@@ -372,7 +372,7 @@ class MaskingNet(nn.Module):
 
         # Mamba-based blocks replacing traditional Transformer blocks
         self.blocks = nn.ModuleList([
-            S6Block(embed_dim, d_state=d_state, dropout=dropout)
+            S3UMBlock(embed_dim, d_state=d_state, dropout=dropout)
             for _ in range(depth)
         ])
 
@@ -420,7 +420,7 @@ class MaskingNet(nn.Module):
         x = torch.cat((cls_tokens, x), dim=1)
         x = x + self.pos_embed
 
-        # Apply Improved S6 blocks
+        # Apply Improved S3UM blocks
         for blk in self.blocks:
             x = blk(x)
 

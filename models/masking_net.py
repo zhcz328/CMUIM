@@ -22,7 +22,7 @@ class MaskingNet(nn.Module):
             self,
             num_tokens,  # Number of image patches/tokens
             embed_dim=256,  # Embedding dimension
-            depth=5,  # Number of S6 blocks
+            depth=5,  # Number of S3UM blocks
             d_state=16,  # State dimension for SSM
             dropout=0.0,  # Dropout rate
             norm_layer=nn.LayerNorm
@@ -33,7 +33,7 @@ class MaskingNet(nn.Module):
         Args:
             num_tokens: Number of image patches/tokens
             embed_dim: Embedding dimension
-            depth: Number of S6 blocks
+            depth: Number of S3UM blocks
             d_state: State dimension for SSM
             dropout: Dropout rate
             norm_layer: Normalization layer
@@ -46,7 +46,7 @@ class MaskingNet(nn.Module):
 
         # Mamba-based blocks replacing traditional Transformer blocks
         self.blocks = nn.ModuleList([
-            S6Block(embed_dim, d_state=d_state, dropout=dropout)
+            S3UMBlock(embed_dim, d_state=d_state, dropout=dropout)
             for _ in range(depth)
         ])
 
@@ -109,7 +109,7 @@ class MaskingNet(nn.Module):
         x = torch.cat((cls_tokens, x), dim=1)
         x = x + self.pos_embed
 
-        # Apply S6 blocks
+        # Apply S3UM blocks
         for blk in self.blocks:
             x = blk(x)
 

@@ -1,5 +1,5 @@
 """
-S6 Block implementation for the S3UM architecture.
+S3UM Block implementation for the S3UM architecture.
 This module provides a Mamba-style architecture featuring selective SSM mechanisms.
 """
 
@@ -21,7 +21,7 @@ class S3UMBlock(nn.Module):
 
     def __init__(self, dim, d_state=16, d_conv=4, dropout=0.1):
         """
-        Initialize the S6 Block.
+        Initialize the S3UM Block.
 
         Args:
             dim: Hidden dimension
@@ -50,7 +50,7 @@ class S3UMBlock(nn.Module):
 
     def forward(self, x):
         """
-        Forward pass of the S6 Block.
+        Forward pass of the S3UM Block.
 
         Args:
             x: [B, L, D] input tensor

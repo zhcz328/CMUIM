@@ -17,7 +17,7 @@ CMUIM is designed to address the unique challenges of ultrasound image analysis 
 The S3UM architecture consists of several key components:
 
 - **SSMKernel**: Implements the selective state space model with input-dependent parameters for adaptive processing of ultrasound content.
-- **S6Block**: Combines selective state space models with convolutional and gating mechanisms for efficient feature extraction.
+- **S3UMBlock**: Combines selective state space models with convolutional and gating mechanisms for efficient feature extraction.
 - **MaskingNet**: Creates masks that prioritize anatomically significant regions for reconstruction.
 - **CMUIM**: The complete model that integrates masked autoencoding with continual learning strategies.
 
