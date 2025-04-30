@@ -34,7 +34,7 @@ from engine.test import (
     calculate_forgetting,
     visualize_mask
 )
-from utils.misc import NativeScaler, save_model, load_model
+from datasets.misc import NativeScaler, save_model, load_model
 
 
 def main(args):
