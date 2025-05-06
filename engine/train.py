@@ -326,7 +326,7 @@ def train_one_epoch_continual(
         with torch.cuda.amp.autocast():
             # Train masking network on combined samples
             loss_recon, loss_area, loss_kl, loss_diversity = model_current(
-                combined_samples,  # Use combined samples with perturbed buffer
+                samples,  # Option: Use combined samples with perturbed buffer
                 mask_ratio=args.mask_ratio,
                 train_mask=True
             )
