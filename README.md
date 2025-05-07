@@ -104,7 +104,7 @@ dataset_root/
 
 ## Continual Learning Scenarios
 
-S3UM supports three continual learning scenarios:
+CMUIM supports three continual learning scenarios:
 
 1. **PUL-IL**: Cross-period ultrasound incremental learning
 2. **IHUL-IL**: Interhospital ultrasound incremental learning
