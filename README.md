@@ -139,23 +139,11 @@ The framework evaluates performance using three key metrics:
 - **FT (Forward Transfer)**: Improvement compared to learning from scratch
 
 ## Citation
-If you use this code or the OS-OGD dataset in your research, please cite:
-```bibtex
-@article{zhu2025cmuim,
-  title={CMUIM: An Industrial-Grade Continual Self-Supervised Learning Framework for Cross-Domain Ultrasound Diagnostic Systems},
-  author={Zhu, Chunzheng and Jiang, Cheng and Tan, Guanghua and Zhu, Ningbo and Yu, Ping and Li, Shengli and Li, Kenli},
-  journal={IEEE Transactions on Industrial Informatics},
-  year={2025},
-  publisher={IEEE}
-}
+If you use this code or the OS-OGD dataset in your research, please cite.
 ```
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contact
-For questions about the code or dataset access, please contact:
-- Chunzheng Zhu: zhuchzh@hnu.edu.cn
 
 ## Acknowledgments
 This work was approved by the institutional ethics committee (approval number SFYLS[2022]068).
