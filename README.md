@@ -7,18 +7,6 @@ CMUIM is designed to address the unique challenges of ultrasound image analysis 
 2. **Bi-level Optimization**: A two-stage optimization process that enhances both task-specific features and cross-task knowledge transfer.
 3. **Semantic-Aware Gradient Perturbation (SAGP)**: A technique that improves feature separability and reduces catastrophic forgetting during task transitions.
 
-## Dataset Access
-The **OS-OGD (Obstetrics and Gynecology Department Ultrasound Dataset)** contains 478,881 ultrasound images collected from 210 hospitals across 49 cities in China. The dataset includes three subsets for different continual learning scenarios:
-- **PUL-IL**: Cross-period incremental learning (40 categories, 5 tasks)
-- **IHUL-IL**: Interhospital incremental learning (24 categories, 5 tasks)
-- **DSUL-IL**: Device-specific incremental learning (24 categories, 5 tasks)
-
-**To request access to the OS-OGD dataset, please contact: zhuchzh@hnu.edu.cn**
-
-Please include the following information in your request:
-- Your name and affiliation
-- Purpose of using the dataset
-- Brief description of your research
 
 ## Installation
 ```bash
