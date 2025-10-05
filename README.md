@@ -1,12 +1,6 @@
 # Towards Stable and Transferable Ultrasound Diagnosis Across Domains via Continual Masked Ultrasound Image Modeling
 This repository implements the CMUIM as described in the paper "Towards Stable and Transferable Ultrasound Diagnosis Across Domains via Continual Masked Ultrasound Image Modeling".
 
-## Overview
-CMUIM is designed to address the unique challenges of ultrasound image analysis in a continual learning setting. The framework includes:
-1. **Selective State Space Ultrasound Masking (S³UM)**: A novel masking strategy that leverages state space models to identify anatomically significant regions in ultrasound images.
-2. **Bi-level Optimization**: A two-stage optimization process that enhances both task-specific features and cross-task knowledge transfer.
-3. **Semantic-Aware Gradient Perturbation (SAGP)**: A technique that improves feature separability and reduces catastrophic forgetting during task transitions.
-
 
 ## Installation
 ```bash
@@ -120,11 +114,6 @@ CMUIM supports three continual learning scenarios:
 - **Classes**: 24 (Mid-to-late Pregnancy data)
 - **Usage**: `python main.py --scenario DSUL-IL`
 
-## Metrics
-The framework evaluates performance using three key metrics:
-- **ALP (Average Linear Precision)**: Overall performance across all tasks
-- **Fgt (Forgetting Rate)**: Knowledge degradation from previous tasks
-- **FT (Forward Transfer)**: Improvement compared to learning from scratch
 
 ## Citation
 If you use this code or the OS-OGD dataset in your research, please cite.
