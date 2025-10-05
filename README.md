@@ -1,5 +1,5 @@
 # Towards Stable and Transferable Ultrasound Diagnosis Across Domains via Continual Masked Ultrasound Image Modeling
-This repository implements the CMUIM as described in the paper "Towards Stable and Transferable Ultrasound Diagnosis Across Domains via Continual Masked Ultrasound Image Modeling".
+This repository provides the official implementation of CMUIM from the paper "Towards Stable and Transferable Ultrasound Diagnosis Across Domains via Continual Masked Ultrasound Image Modeling".
 
 
 ## Installation
