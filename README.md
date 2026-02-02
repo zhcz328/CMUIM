@@ -114,7 +114,6 @@ CMUIM supports three continual learning scenarios:
 - **Classes**: 24 (Mid-to-late Pregnancy data)
 - **Usage**: `python main.py --scenario DSUL-IL`
 
-
 ## Citation
 If you use this code or the OS-OGD dataset in your research, please cite.
 
