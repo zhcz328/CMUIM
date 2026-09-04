@@ -130,6 +130,8 @@ The `midlate_data.tar.gz` archive contains a subset of the mid-to-late pregnancy
 Download: [`midlate_data.tar.gz`](https://pan.baidu.com/s/1XwirkUcyxVhTll1ddoSHJw)<br>
 Extraction code: `6a9u`
 
+The remaining subsets will be released after the paper is publicly published.
+
 ## Continual Learning Scenarios
 CMUIM supports three continual learning scenarios:
 
