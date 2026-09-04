@@ -96,6 +96,40 @@ OS-OGD/
     └── task5_Others/
 ```
 
+### Mid-to-late Pregnancy Subset
+The `midlate_data.tar.gz` archive contains a subset of the mid-to-late pregnancy ultrasound data used in the paper (see `main.tex` in the paper project). It includes the following 25 classes:
+
+| Label ID | Class |
+| ---: | --- |
+| 0 | Two images |
+| 1 | Four images |
+| 2 | Spectral Doppler image |
+| 3 | Transverse section of the maxillary alveolar ridge |
+| 4 | Transverse section at the upper abdomen and gallbladder level |
+| 5 | Other |
+| 6 | Transverse section of both eyeballs |
+| 7 | Transverse section of both kidneys |
+| 8 | Sagittal section of the internal cervical os |
+| 9 | Coronal sections of the radius and ulna; coronal sections of the tibia and fibula; sagittal section of the lower leg |
+| 10 | Partial cardiac sections |
+| 11 | Coronal section of the palm; section of the sole |
+| 12 | Oblique coronal section of the hard palate |
+| 13 | Long-axis sections of the femur and humerus |
+| 14 | Coronal sections of the kidney and diaphragm |
+| 15 | Sagittal sections of the kidney and diaphragm |
+| 16 | Section at the placental umbilical cord insertion |
+| 17 | Transverse section at the umbilical cord entrance into the abdominal wall |
+| 18 | Sagittal sections of the lumbosacral-coccygeal and cervicothoracic spine |
+| 19 | Color Doppler transverse section at the bladder level |
+| 20 | Oblique coronal section of the soft palate |
+| 21 | Partial cranial and intracranial sections |
+| 22 | Coronal section of the face |
+| 23 | Midsagittal section of the face |
+| 24 | Coronal section of the nasolabial region |
+
+Download: [`midlate_data.tar.gz`](https://pan.baidu.com/s/1XwirkUcyxVhTll1ddoSHJw)<br>
+Extraction code: `6a9u`
+
 ## Continual Learning Scenarios
 CMUIM supports three continual learning scenarios:
 
